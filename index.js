@@ -20,6 +20,7 @@ app.get('/', function (req, res) {
 
 // for Facebook verification
 app.get('/webhook/', function (req, res) {
+	console.log('webhook get')
 	if (req.query['hub.verify_token'] === 'right_stallion_mains_paperclip') {
 		res.send(req.query['hub.challenge'])
 	}
@@ -32,6 +33,7 @@ app.listen(app.get('port'), function() {
 })
 
 app.post('/webhook/', function (req, res) {
+	console.log('webhook post')
 	let messaging_events = req.body.entry[0].messaging
 	for (let i = 0; i < messaging_events.length; i++) {
 		let event = req.body.entry[0].messaging[i]
@@ -47,6 +49,7 @@ app.post('/webhook/', function (req, res) {
 const token = process.env.FB_PAGE_ACCESS_TOKEN
 
 function sendTextMessage(sender, text) {
+	console.log('send text message')
 	let messageData = { text:text }
 	request({
 	        url: 'https://graph.facebook.com/v2.6/me/messages',
