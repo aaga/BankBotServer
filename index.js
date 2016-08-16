@@ -133,6 +133,7 @@ const actions = {
 	  return new Promise(function(resolve, reject) {
 		  var account_type = firstEntityValue(entities, "account_type")
 		  if (account_type) {
+			  console.log("account_type exists");
 			  context.account_type = account_type;
 			  context.account_balance = 120.00;
 		  }
