@@ -1,6 +1,9 @@
 {
   "name": "fb-chatbot",
   "version": "1.0.0",
+  "engines": {
+    "node": "6.2.2"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
