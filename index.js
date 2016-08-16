@@ -117,7 +117,7 @@ const actions = {
   },
 
   // Custom actions
-  getBalance({context}, {entities}) {
+  getBalance({context, entities}) {
 	  return new Promise(function(resolve, reject) {
 		  var account_type = firstEntityValue(entities, "account_type")
 		  if (account_type) {
