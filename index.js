@@ -130,8 +130,10 @@ const actions = {
 
   // Custom actions
   getBalance({context, entities}) {
+	  console.log("intent understood");
 	  return new Promise(function(resolve, reject) {
-		  var account_type = firstEntityValue(entities, "account_type")
+		  var account_type = firstEntityValue(entities, "account_type");
+		  console.log(account_type);
 		  if (account_type) {
 			  console.log("account_type exists");
 			  context.account_type = account_type;
