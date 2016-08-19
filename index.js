@@ -39,32 +39,7 @@ crypto.randomBytes(8, (err, buff) => {
 });
 
 // ----------------------------------------------------------------------------
-// Messenger API specific code
 
-// See the Send API reference
-// https://developers.facebook.com/docs/messenger-platform/send-api-reference
-
-const fbMessage = (id, text) => {
-  const body = JSON.stringify({
-    recipient: { id },
-    message: { text },
-  });
-  const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
-  return fetch('https://graph.facebook.com/me/messages?' + qs, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body,
-  })
-  .then(rsp => rsp.json())
-  .then(json => {
-    if (json.error && json.error.message) {
-      throw new Error(json.error.message);
-    }
-    return json;
-  });
-};
-
-// ----------------------------------------------------------------------------
 // Wit.ai bot specific code
 
 // This will contain all user sessions.
@@ -112,11 +87,14 @@ const actions = {
     // Our bot has something to say!
     // Let's retrieve the Facebook user whose session belongs to
     const recipientId = sessions[sessionId].fbid;
+
     if (recipientId) {
+      sendTypingOff(recipientId);
+
       // Yay, we found our recipient!
       // Let's forward our bot response to her.
       // We return a promise to let our bot know when we're done sending
-      return fbMessage(recipientId, {text, quickreplies})
+      return fbMessage(recipientId, text, quickreplies)
       .then(() => null)
       .catch((err) => {
         console.error(
@@ -200,6 +178,9 @@ app.post('/webhook', (req, res) => {
           // We retrieve the Facebook user ID of the sender
           const sender = event.sender.id;
 
+          sendReadReceipt(sender);
+          sendTypingOn(sender);
+
           // We retrieve the user's current session, or create one if it doesn't exist
           // This is needed for our bot to figure out the conversation history
           const sessionId = findOrCreateSession(sender);
@@ -250,6 +231,155 @@ app.post('/webhook', (req, res) => {
   res.sendStatus(200);
 });
 
+// ----------------------------------------------------------------------------
+// Messenger API specific code
+
+// See the Send API reference
+// https://developers.facebook.com/docs/messenger-platform/send-api-reference
+
+const fbMessage = (recipientId, messageText, quickreplies) => {
+  // const body = JSON.stringify({
+  //   recipient: { id },
+  //   message: { text },
+  // });
+  // const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
+  // return fetch('https://graph.facebook.com/me/messages?' + qs, {
+  //   method: 'POST',
+  //   headers: {'Content-Type': 'application/json'},
+  //   body,
+  // })
+  // .then(rsp => rsp.json())
+  // .then(json => {
+  //   if (json.error && json.error.message) {
+  //     throw new Error(json.error.message);
+  //   }
+  //   return json;
+  // });
+  if (quickreplies) {
+  	sendQuickReply(recipientId, messageText, quickreplies);
+  } else {
+  	sendTextMessage(recipientId, messageText);
+  }
+};
+
+/*
+ * Send a text message using the Send API.
+ *
+ */
+function sendTextMessage(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText,
+      metadata: "DEVELOPER_DEFINED_METADATA"
+    }
+  };
+
+  callSendAPI(messageData);
+}
+
+/*
+ * Send a message with Quick Reply buttons.
+ *
+ */
+function sendQuickReply(recipientId, messageText, quickreplies) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText,
+      metadata: "DEVELOPER_DEFINED_METADATA",
+      quick_replies: quickreplies.map(x => {"title": x, "content_type": "text", "payload": "empty"});
+    }
+  };
+
+  callSendAPI(messageData);
+}
+
+/*
+ * Send a read receipt to indicate the message has been read
+ *
+ */
+function sendReadReceipt(recipientId) {
+  console.log("Sending a read receipt to mark message as seen");
+
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    sender_action: "mark_seen"
+  };
+
+  callSendAPI(messageData);
+}
+
+/*
+ * Turn typing indicator on
+ *
+ */
+function sendTypingOn(recipientId) {
+  console.log("Turning typing indicator on");
+
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    sender_action: "typing_on"
+  };
+
+  callSendAPI(messageData);
+}
+
+/*
+ * Turn typing indicator off
+ *
+ */
+function sendTypingOff(recipientId) {
+  console.log("Turning typing indicator off");
+
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    sender_action: "typing_off"
+  };
+
+  callSendAPI(messageData);
+}
+
+/*
+ * Call the Send API. The message data goes in the body. If successful, we'll 
+ * get the message id in a response 
+ *
+ */
+function callSendAPI(messageData) {
+  request({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: PAGE_ACCESS_TOKEN },
+    method: 'POST',
+    json: messageData
+
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var recipientId = body.recipient_id;
+      var messageId = body.message_id;
+
+      if (messageId) {
+        console.log("Successfully sent message with id %s to recipient %s", 
+          messageId, recipientId);
+      } else {
+      console.log("Successfully called Send API for recipient %s", 
+        recipientId);
+      }
+    } else {
+      console.error(response.error);
+    }
+  });  
+}
+
 /*
  * Verify that the callback came from Facebook. Using the App Secret from
  * the App Dashboard, we can verify the signature that is sent with each
@@ -279,6 +409,8 @@ function verifyRequestSignature(req, res, buf) {
     }
   }
 }
+
+// ----------------------------------------------------------------------------
 
 app.listen(PORT);
 console.log('Listening on :' + PORT + '...');
