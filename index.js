@@ -94,7 +94,7 @@ const actions = {
       // Yay, we found our recipient!
       // Let's forward our bot response to her.
       // We return a promise to let our bot know when we're done sending
-      return fbMessage(recipientId, text, quickreplies)
+      return fbMessage(recipientId, text)
       .then(() => null)
       .catch((err) => {
         console.error(
@@ -238,7 +238,7 @@ app.post('/webhook', (req, res) => {
 // See the Send API reference
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 
-/*const fbMessage = (recipientId, messageText, quickreplies) => {
+const fbMessage = (recipientId, messageText) => {
   const body = JSON.stringify({
     recipient: { id },
     message: { text },
@@ -256,15 +256,16 @@ app.post('/webhook', (req, res) => {
     }
     return json;
   });
-};*/
-function fbMessage(recipientId, messageText, quickreplies) {
+};
+
+/*function fbMessage(recipientId, messageText, quickreplies) {
   console.log(recipientId);
   if (quickreplies) {
   	return sendQuickReply(recipientId, messageText, quickreplies);
   } else {
   	return sendTextMessage(recipientId, messageText);
   }
-};
+};*/
 
 /*
  * Send a text message using the Send API.
