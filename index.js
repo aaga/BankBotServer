@@ -89,7 +89,7 @@ const actions = {
     const recipientId = sessions[sessionId].fbid;
 
     if (recipientId) {
-      sendTypingOff(recipientId);
+      //sendTypingOff(recipientId);
 
       // Yay, we found our recipient!
       // Let's forward our bot response to her.
@@ -178,8 +178,8 @@ app.post('/webhook', (req, res) => {
           // We retrieve the Facebook user ID of the sender
           const sender = event.sender.id;
 
-          sendReadReceipt(sender);
-          sendTypingOn(sender);
+          //sendReadReceipt(sender);
+          //sendTypingOn(sender);
 
           // We retrieve the user's current session, or create one if it doesn't exist
           // This is needed for our bot to figure out the conversation history
