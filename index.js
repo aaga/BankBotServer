@@ -238,28 +238,30 @@ app.post('/webhook', (req, res) => {
 // See the Send API reference
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 
-const fbMessage = (recipientId, messageText, quickreplies) => {
-  // const body = JSON.stringify({
-  //   recipient: { id },
-  //   message: { text },
-  // });
-  // const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
-  // return fetch('https://graph.facebook.com/me/messages?' + qs, {
-  //   method: 'POST',
-  //   headers: {'Content-Type': 'application/json'},
-  //   body,
-  // })
-  // .then(rsp => rsp.json())
-  // .then(json => {
-  //   if (json.error && json.error.message) {
-  //     throw new Error(json.error.message);
-  //   }
-  //   return json;
-  // });
+/*const fbMessage = (recipientId, messageText, quickreplies) => {
+  const body = JSON.stringify({
+    recipient: { id },
+    message: { text },
+  });
+  const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
+  return fetch('https://graph.facebook.com/me/messages?' + qs, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body,
+  })
+  .then(rsp => rsp.json())
+  .then(json => {
+    if (json.error && json.error.message) {
+      throw new Error(json.error.message);
+    }
+    return json;
+  });
+};*/
+function fbMessage(recipientId, messageText, quickreplies) {
   if (quickreplies) {
-  	sendQuickReply(recipientId, messageText, quickreplies);
+  	return sendQuickReply(recipientId, messageText, quickreplies);
   } else {
-  	sendTextMessage(recipientId, messageText);
+  	return sendTextMessage(recipientId, messageText);
   }
 };
 
@@ -278,7 +280,7 @@ function sendTextMessage(recipientId, messageText) {
     }
   };
 
-  callSendAPI(messageData);
+  return callSendAPI(messageData);
 }
 
 /*
@@ -300,7 +302,7 @@ function sendQuickReply(recipientId, messageText, quickreplies) {
     }
   };
 
-  callSendAPI(messageData);
+  return callSendAPI(messageData);
 }
 
 /*
@@ -317,7 +319,7 @@ function sendReadReceipt(recipientId) {
     sender_action: "mark_seen"
   };
 
-  callSendAPI(messageData);
+  return callSendAPI(messageData);
 }
 
 /*
@@ -334,7 +336,7 @@ function sendTypingOn(recipientId) {
     sender_action: "typing_on"
   };
 
-  callSendAPI(messageData);
+  return callSendAPI(messageData);
 }
 
 /*
@@ -351,7 +353,7 @@ function sendTypingOff(recipientId) {
     sender_action: "typing_off"
   };
 
-  callSendAPI(messageData);
+  return callSendAPI(messageData);
 }
 
 /*
@@ -360,7 +362,7 @@ function sendTypingOff(recipientId) {
  *
  */
 function callSendAPI(messageData) {
-  request({
+  /*request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
     qs: { access_token: FB_PAGE_TOKEN },
     method: 'POST',
@@ -381,7 +383,20 @@ function callSendAPI(messageData) {
     } else {
       console.error(response.error);
     }
-  });  
+  });  */
+  const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
+  return fetch('https://graph.facebook.com/me/messages?' + qs, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    json: messageData,
+  })
+  .then(rsp => rsp.json())
+  .then(json => {
+    if (json.error && json.error.message) {
+      throw new Error(json.error.message);
+    }
+    return json;
+  });
 }
 
 /*
