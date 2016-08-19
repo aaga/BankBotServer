@@ -238,7 +238,7 @@ app.post('/webhook', (req, res) => {
 // See the Send API reference
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 
-const fbMessage = (recipientId, messageText) => {
+const fbMessage = (id, text) => {
   const body = JSON.stringify({
     recipient: { id },
     message: { text },
