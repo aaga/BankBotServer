@@ -258,6 +258,7 @@ app.post('/webhook', (req, res) => {
   });
 };*/
 function fbMessage(recipientId, messageText, quickreplies) {
+  console.log(recipientId);
   if (quickreplies) {
   	return sendQuickReply(recipientId, messageText, quickreplies);
   } else {
