@@ -101,9 +101,14 @@ const firstEntityValue = (entities, entity) => {
   return typeof val === 'object' ? val.value : val;
 };
 
+const balances = {
+	"current": "120.00",
+	"savings": "560.00"
+};
+
 // Our bot actions
 const actions = {
-  send({sessionId}, {text}) {
+  send({sessionId}, {text, quickreplies}) {
     // Our bot has something to say!
     // Let's retrieve the Facebook user whose session belongs to
     const recipientId = sessions[sessionId].fbid;
@@ -111,7 +116,7 @@ const actions = {
       // Yay, we found our recipient!
       // Let's forward our bot response to her.
       // We return a promise to let our bot know when we're done sending
-      return fbMessage(recipientId, text)
+      return fbMessage(recipientId, {text, quickreplies})
       .then(() => null)
       .catch((err) => {
         console.error(
@@ -136,8 +141,17 @@ const actions = {
 		  console.log(account_type);
 		  if (account_type) {
 			  context.account_type = account_type;
-			  context.account_balance = "120.00";
+			  context.account_balance = balances[account_type];
+		  } else {
+			  context.account_balance = balances["current"];
 		  }
+		  return resolve(context);
+	  });
+  },
+
+  endConversation({context}) {
+	  return new Promise(function(resolve, reject) {
+		  context.done = true;
 		  return resolve(context);
 	  });
   },
@@ -215,12 +229,13 @@ app.post('/webhook', (req, res) => {
               // Based on the session state, you might want to reset the session.
               // This depends heavily on the business logic of your bot.
               // Example:
-              // if (context['done']) {
-              //   delete sessions[sessionId];
-              // }
+              if (context['done']) {
+                delete sessions[sessionId];
+              } else {
 
-              // Updating the user's current session state
-              sessions[sessionId].context = context;
+                // Updating the user's current session state
+                sessions[sessionId].context = context;
+          	  }
             })
             .catch((err) => {
               console.error('Oops! Got an error from Wit: ', err.stack || err);
