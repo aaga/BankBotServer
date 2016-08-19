@@ -285,6 +285,7 @@ function sendTextMessage(recipientId, messageText) {
  *
  */
 function sendQuickReply(recipientId, messageText, quickreplies) {
+  var formatted_quick_replies = quickreplies.map(x => {"title": x, "content_type": "text", "payload": "empty"});
   var messageData = {
     recipient: {
       id: recipientId
@@ -292,7 +293,7 @@ function sendQuickReply(recipientId, messageText, quickreplies) {
     message: {
       text: messageText,
       metadata: "DEVELOPER_DEFINED_METADATA",
-      quick_replies: quickreplies.map(x => {"title": x, "content_type": "text", "payload": "empty"});
+      quick_replies: formatted_quick_replies;
     }
   };
 
