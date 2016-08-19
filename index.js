@@ -385,6 +385,7 @@ function callSendAPI(messageData) {
       console.error(response.error);
     }
   });  */
+  console.log(messageData);
   const qs = 'access_token=' + encodeURIComponent(FB_PAGE_TOKEN);
   return fetch('https://graph.facebook.com/me/messages?' + qs, {
     method: 'POST',
