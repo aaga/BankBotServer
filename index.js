@@ -295,7 +295,7 @@ function sendQuickReply(recipientId, messageText, {quickreplies}) {
     message: {
       text: messageText,
       metadata: "DEVELOPER_DEFINED_METADATA",
-      quick_replies: formatted_quick_replies;
+      quick_replies: formatted_quick_replies
     }
   };
 
