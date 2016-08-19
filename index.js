@@ -211,6 +211,7 @@ app.post('/webhook', (req, res) => {
               // This depends heavily on the business logic of your bot.
               // Example:
               if (context['done']) {
+              	console.log("conversation done");
                 delete sessions[sessionId];
               } else {
 
@@ -237,7 +238,7 @@ app.post('/webhook', (req, res) => {
 // See the Send API reference
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 
-const fbMessage = (recipientId, messageText, {quickreplies}) => {
+const fbMessage = (recipientId, messageText, quickreplies) => {
   // const body = JSON.stringify({
   //   recipient: { id },
   //   message: { text },
@@ -284,7 +285,7 @@ function sendTextMessage(recipientId, messageText) {
  * Send a message with Quick Reply buttons.
  *
  */
-function sendQuickReply(recipientId, messageText, {quickreplies}) {
+function sendQuickReply(recipientId, messageText, quickreplies) {
   var formatted_quick_replies = quickreplies.map(function(reply) {
   	return {"title": text, "content_type": "text", "payload": "empty"};
   });
