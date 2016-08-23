@@ -130,12 +130,33 @@ const actions = {
   	  	  var payment_recipient = firstEntityValue(entities, "contact");
   	  	  var payment_amount = firstEntityValue(entities, "amount_of_money");
   	  	  var payment_reference = firstEntityValue(entities, "payment_reference");
+  	  	  var account_type = firstEntityValue(entities, "account_type");
 
   	  	  // Process payment
 
   	  	  context.payment_recipient = payment_recipient;
   	  	  context.payment_amount = Number(payment_amount).toFixed(2);
-  	  	  context.payment_reference = payment_reference;
+  	  	  if (account_type) {
+  	  	  	context.account_type = account_type;
+  	  	  } else {
+  	  	  	context.account_type = "current";
+  	  	  }
+  	  	  if (payment_reference) {
+  	  	  	context.payment_reference = payment_reference;
+  	  	  }
+
+  	  	  return resolve(context);
+  	  });
+  },
+
+  updatePaymentReference({context, text, entities}) {
+  	  return new Promise(function(resolve, reject) {
+  	  	  var payment_reference = firstEntityValue(entities, "payment_reference");
+  	  	  if (payment_reference) {
+  	  	  	context.payment_reference = payment_reference;
+  	  	  } else {
+  	  	  	context.payment_reference = text;
+  	  	  }
 
   	  	  return resolve(context);
   	  });
