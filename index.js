@@ -113,10 +113,8 @@ const actions = {
 
   // Custom actions
   getBalance({context, entities}) {
-	  console.log("intent understood");
 	  return new Promise(function(resolve, reject) {
 		  var account_type = firstEntityValue(entities, "account_type");
-		  console.log(account_type);
 		  if (account_type) {
 			  context.account_type = account_type;
 			  context.account_balance = balances[account_type];
@@ -126,6 +124,22 @@ const actions = {
 		  return resolve(context);
 	  });
   },
+
+  doPayment({context, entities}) {
+  	  return new Promise(function(resolve, reject) {
+  	  	  var payment_recipient = firstEntityValue(entities, "contact");
+  	  	  var payment_amount = firstEntityValue(entities, "amount_of_money");
+  	  	  var payment_reference = firstEntityValue(entities, "payment_reference");
+
+  	  	  // Process payment
+
+  	  	  context.payment_recipient = payment_recipient;
+  	  	  context.payment_amount = payment_amount;
+  	  	  context.payment_reference = payment_reference;
+
+  	  	  return resolve(context);
+  	  })
+  }
 
   endConversation({context}) {
 	  return new Promise(function(resolve, reject) {
@@ -205,12 +219,12 @@ app.post('/webhook', (req, res) => {
             ).then((context) => {
               // Our bot did everything it has to do.
               // Now it's waiting for further messages to proceed.
-              console.log('Waiting for next user messages');
 
               // Based on the session state, you might want to reset the session.
               // This depends heavily on the business logic of your bot.
               // Example:
-              if (context['done']) {
+              if (context.done) {
+              	context.done = false;
               	console.log("conversation done");
                 delete sessions[sessionId];
               } else {
