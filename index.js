@@ -134,7 +134,7 @@ const actions = {
   	  	  // Process payment
 
   	  	  context.payment_recipient = payment_recipient;
-  	  	  context.payment_amount = payment_amount;
+  	  	  context.payment_amount = Number(payment_amount).toFixed(2);
   	  	  context.payment_reference = payment_reference;
 
   	  	  return resolve(context);
