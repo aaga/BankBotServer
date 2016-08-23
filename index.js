@@ -138,8 +138,8 @@ const actions = {
   	  	  context.payment_reference = payment_reference;
 
   	  	  return resolve(context);
-  	  })
-  }
+  	  });
+  },
 
   endConversation({context}) {
 	  return new Promise(function(resolve, reject) {
