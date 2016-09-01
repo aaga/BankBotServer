@@ -76,6 +76,7 @@ const firstEntityValue = (entities, entity) => {
   return typeof val === 'object' ? val.value : val;
 };
 
+// Fake balances
 const balances = {
 	"current": "120.00",
 	"savings": "560.00"
@@ -117,10 +118,26 @@ const actions = {
 		  var account_type = firstEntityValue(entities, "account_type");
 		  if (account_type) {
 			  context.account_type = account_type;
-			  context.account_balance = balances[account_type];
+			  // Uncomment to fall back to fake balances
+			  //context.account_balance = balances[account_type];
 		  } else {
-			  context.account_balance = balances["current"];
+		  	  // Uncomment to fall back to fake balances
+			  //context.account_balance = balances["current"];
 		  }
+
+		  // Return same balance regardless of account type (for now)
+
+		  request({
+    		url: "https://c91922b5.ngrok.io/wines",
+    		json: true
+		  }, function (error, response, body) {
+		  	// TODO: Extract balance from Ashley's JSON
+		  });
+
+    if (!error && response.statusCode === 200) {
+        console.log(body) // Print the json response
+    }
+})
 		  return resolve(context);
 	  });
   },
